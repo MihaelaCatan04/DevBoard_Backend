@@ -17,9 +17,11 @@ public class PostService {
 
     private final PostMapper postMapper;
 
-    public PageResponse<Post> getAllPosts(int limit, int skip, String tag) {
-        List<Post> posts = postMapper.findAll(limit, skip, tag);
-        long total = postMapper.countAll(tag);
+    public PageResponse<Post> getAllPosts(int limit, int skip,
+                                          String tag, String search,
+                                          String sort) {
+        List<Post> posts = postMapper.findAll(limit, skip, tag, search, sort);
+        long total = postMapper.countAll(tag, search);
         return new PageResponse<>(posts, limit, skip, total);
     }
 
