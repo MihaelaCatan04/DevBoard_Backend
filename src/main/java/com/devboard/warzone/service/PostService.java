@@ -3,6 +3,7 @@ package com.devboard.warzone.service;
 import com.devboard.warzone.dto.PageResponse;
 import com.devboard.warzone.dto.PostRequest;
 import com.devboard.warzone.mapper.PostMapper;
+import com.devboard.warzone.mapper.VoteMapper;
 import com.devboard.warzone.model.Post;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,7 @@ import java.util.List;
 public class PostService {
 
     private final PostMapper postMapper;
+    private final VoteMapper voteMapper;
 
     public PageResponse<Post> getAllPosts(int limit, int skip, String tag, String search, String sort) {
         List<Post> posts = postMapper.findAll(limit, skip, tag, search, sort);
@@ -91,5 +93,30 @@ public class PostService {
 
     public PageResponse<Post> getAllPostsIncludingDeleted(int limit, int skip) {
         return new PageResponse<>(postMapper.findAllIncludingDeleted(limit, skip), limit, skip, postMapper.countAllIncludingDeleted());
+    }
+
+    public int votePost(Long id, int direction, String username) {
+        if (direction != 1 && direction != -1) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Direction must be 1 or -1");
+        }
+
+        getPostById(id);
+
+        Integer existingVote = voteMapper.findVote(username, id);
+
+        if (existingVote == null) {
+            voteMapper.insertVote(username, id, direction);
+            postMapper.updateVotes(id, direction);
+
+        } else if (existingVote == direction) {
+            voteMapper.deleteVote(username, id);
+            postMapper.updateVotes(id, -direction);  // reverse it
+
+        } else {
+            voteMapper.updateVote(username, id, direction);
+            postMapper.updateVotes(id, direction * 2);
+        }
+
+        return postMapper.findById(id).getVotes();
     }
 }

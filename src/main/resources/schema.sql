@@ -30,3 +30,12 @@ CREATE TABLE IF NOT EXISTS users
 ALTER TABLE posts
     ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP DEFAULT NULL;
 
+CREATE TABLE IF NOT EXISTS post_votes
+(
+    username   VARCHAR(100) NOT NULL,
+    post_id    BIGINT       NOT NULL REFERENCES posts (id) ON DELETE CASCADE,
+    direction  INT          NOT NULL CHECK (direction IN (-1, 1)),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (username, post_id)
+);
+

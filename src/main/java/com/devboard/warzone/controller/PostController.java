@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/posts")
@@ -27,16 +28,9 @@ public class PostController {
 
     @GetMapping
     @Operation(summary = "Get posts — paginated, filterable, searchable, sortable")
-    public ResponseEntity<PageResponse<Post>> getAllPosts(
-            @RequestParam(defaultValue = "10")   int limit,
-            @RequestParam(defaultValue = "0")    int skip,
-            @RequestParam(required = false)      String tag,
-            @RequestParam(required = false)      String search,
-            @RequestParam(defaultValue = "date") String sort) {
+    public ResponseEntity<PageResponse<Post>> getAllPosts(@RequestParam(defaultValue = "10") int limit, @RequestParam(defaultValue = "0") int skip, @RequestParam(required = false) String tag, @RequestParam(required = false) String search, @RequestParam(defaultValue = "date") String sort) {
 
-        return ResponseEntity.ok(
-                postService.getAllPosts(limit, skip, tag, search, sort)
-        );
+        return ResponseEntity.ok(postService.getAllPosts(limit, skip, tag, search, sort));
     }
 
     @GetMapping("/{id}")
@@ -50,8 +44,7 @@ public class PostController {
     public ResponseEntity<Post> createPost(@Valid @RequestBody PostRequest request, Principal principal) {  // Principal gives us the logged-in username
 
         Post post = postService.createPost(request, principal.getName());
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(post);
+        return ResponseEntity.status(HttpStatus.CREATED).body(post);
     }
 
     @PutMapping("/{id}")
@@ -74,11 +67,12 @@ public class PostController {
     }
 
     @PostMapping("/{id}/vote")
-    @Operation(summary = "Vote on a post — pass direction: 1 or -1", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<Void> vote(@PathVariable Long id, @RequestParam int direction) {
+    @Operation(summary = "Vote on a post — 1 or -1. Voting same direction cancels vote.", security = @SecurityRequirement(name = "bearerAuth"))
+    public ResponseEntity<Map<String, Integer>> vote(@PathVariable Long id, @RequestParam int direction, Principal principal) {
 
-        postService.votePost(id, direction);
-        return ResponseEntity.ok().build();
+        int newVotes = postService.votePost(id, direction, principal.getName());
+
+        return ResponseEntity.ok(Map.of("votes", newVotes));
     }
 
     private String extractRole(String authHeader) {
