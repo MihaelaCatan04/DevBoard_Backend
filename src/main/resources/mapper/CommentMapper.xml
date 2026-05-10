@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.devboard.warzone.mapper.CommentMapper">
+
+    <resultMap id="commentResultMap" type="com.devboard.warzone.model.Comment">
+        <id     property="id"        column="id"/>
+        <result property="postId"    column="post_id"/>
+        <result property="author"    column="author"/>
+        <result property="body"      column="body"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+    <select id="findByPostId" resultMap="commentResultMap">
+        SELECT * FROM comments
+        WHERE post_id = #{postId}
+        ORDER BY created_at ASC
+        LIMIT #{limit} OFFSET #{skip}
+    </select>
+
+    <select id="countByPostId" resultType="long">
+        SELECT COUNT(*) FROM comments WHERE post_id = #{postId}
+    </select>
+
+    <select id="findById" resultMap="commentResultMap">
+        SELECT * FROM comments WHERE id = #{id}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO comments (post_id, author, body)
+        VALUES (#{postId}, #{author}, #{body})
+    </insert>
+
+    <delete id="delete">
+        DELETE FROM comments WHERE id = #{id}
+    </delete>
+
+</mapper>
