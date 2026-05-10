@@ -10,7 +10,7 @@ public class Post {
     private String body;
     private String author;
     private String tag;
-    private int votes;
+    private Integer votes;
     private LocalDateTime createdAt;
     private LocalDateTime deletedAt;
 }

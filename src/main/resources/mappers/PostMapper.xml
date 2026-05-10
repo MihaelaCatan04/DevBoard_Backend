@@ -47,6 +47,7 @@
         LIMIT #{limit} OFFSET #{skip}
     </select>
 
+
     <select id="countAll" resultType="long">
         SELECT COUNT(*) FROM posts
         <where>
