@@ -26,10 +26,17 @@ public class PostController {
     private final JwtUtil jwtUtil;
 
     @GetMapping
-    @Operation(summary = "Get all posts — paginated, filterable by tag")
-    public ResponseEntity<PageResponse<Post>> getAllPosts(@RequestParam(defaultValue = "10") int limit, @RequestParam(defaultValue = "0") int skip, @RequestParam(required = false) String tag) {
+    @Operation(summary = "Get posts — paginated, filterable, searchable, sortable")
+    public ResponseEntity<PageResponse<Post>> getAllPosts(
+            @RequestParam(defaultValue = "10")   int limit,
+            @RequestParam(defaultValue = "0")    int skip,
+            @RequestParam(required = false)      String tag,
+            @RequestParam(required = false)      String search,
+            @RequestParam(defaultValue = "date") String sort) {
 
-        return ResponseEntity.ok(postService.getAllPosts(limit, skip, tag));
+        return ResponseEntity.ok(
+                postService.getAllPosts(limit, skip, tag, search, sort)
+        );
     }
 
     @GetMapping("/{id}")

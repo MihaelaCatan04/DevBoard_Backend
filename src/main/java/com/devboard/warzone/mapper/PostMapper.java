@@ -8,10 +8,6 @@ import java.util.List;
 
 @Mapper
 public interface PostMapper {
-    List<Post> findAll(@Param("limit") int limit, @Param("skip") int skip, @Param("tag") String tag);
-
-    long countAll(@Param("tag") String tag);
-
     Post findById(@Param("id") Long id);
 
     void insert(Post post);
@@ -21,4 +17,8 @@ public interface PostMapper {
     void delete(@Param("id") Long id);
 
     void updateVotes(@Param("id") Long id, @Param("direction") int direction);
+
+    List<Post> findAll(@Param("limit") int limit, @Param("skip") int skip, @Param("tag") String tag, @Param("search") String search, @Param("sort") String sort);
+
+    long countAll(@Param("tag") String tag, @Param("search") String search);
 }

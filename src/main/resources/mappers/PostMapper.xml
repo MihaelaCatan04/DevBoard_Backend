@@ -15,28 +15,6 @@
         <result property="createdAt" column="created_at"/>
     </resultMap>
 
-    <!-- Get all posts with optional tag filter and pagination -->
-    <select id="findAll" resultMap="postResultMap">
-        SELECT * FROM posts
-        <where>
-            <if test="tag != null and tag != ''">
-                AND tag = #{tag}
-            </if>
-        </where>
-        ORDER BY created_at DESC
-        LIMIT #{limit} OFFSET #{skip}
-    </select>
-
-    <!-- Count total posts (needed for pagination metadata) -->
-    <select id="countAll" resultType="long">
-        SELECT COUNT(*) FROM posts
-        <where>
-            <if test="tag != null and tag != ''">
-                AND tag = #{tag}
-            </if>
-        </where>
-    </select>
-
     <!-- Get single post by id -->
     <select id="findById" resultMap="postResultMap">
         SELECT *
@@ -74,4 +52,50 @@
         WHERE id = #{id}
     </update>
 
+    <select id="findAll" resultMap="postResultMap">
+        SELECT * FROM posts
+        <where>
+            <if test="tag != null and tag != ''">
+                AND tag = #{tag}
+            </if>
+            <if test="search != null and search != ''">
+                AND (
+                LOWER(title) LIKE LOWER(CONCAT('%', #{search}, '%'))
+                OR
+                LOWER(body) LIKE LOWER(CONCAT('%', #{search}, '%'))
+                )
+            </if>
+        </where>
+        <choose>
+            <when test="sort == 'votes'">
+                ORDER BY votes DESC
+            </when>
+            <when test="sort == 'comments'">
+                ORDER BY (
+                SELECT COUNT(*) FROM comments
+                WHERE comments.post_id = posts.id
+                ) DESC
+            </when>
+            <otherwise>
+                ORDER BY created_at DESC
+            </otherwise>
+        </choose>
+        LIMIT #{limit} OFFSET #{skip}
+    </select>
+
+    <select id="countAll" resultType="long">
+        SELECT COUNT(*) FROM posts
+        <where>
+            <if test="tag != null and tag != ''">
+                AND tag = #{tag}
+            </if>
+            <if test="search != null and search != ''">
+                AND (
+                LOWER(title) LIKE LOWER(CONCAT('%', #{search}, '%'))
+                OR
+                LOWER(body) LIKE LOWER(CONCAT('%', #{search}, '%'))
+                )
+            </if>
+        </where>
+    </select>
 </mapper>
