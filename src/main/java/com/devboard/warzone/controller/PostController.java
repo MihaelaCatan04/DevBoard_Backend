@@ -8,6 +8,7 @@ import com.devboard.warzone.service.PostService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,7 +40,7 @@ public class PostController {
 
     @PostMapping
     @Operation(summary = "Create a post — requires WRITER or ADMIN role", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<Post> createPost(@RequestBody PostRequest request, Principal principal) {  // Principal gives us the logged-in username
+    public ResponseEntity<Post> createPost(@Valid @RequestBody PostRequest request, Principal principal) {  // Principal gives us the logged-in username
 
         Post post = postService.createPost(request, principal.getName());
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -48,7 +49,7 @@ public class PostController {
 
     @PutMapping("/{id}")
     @Operation(summary = "Edit a post — only author or ADMIN", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<Post> updatePost(@PathVariable Long id, @RequestBody PostRequest request, Principal principal, @RequestHeader("Authorization") String authHeader) {
+    public ResponseEntity<Post> updatePost(@Valid @PathVariable Long id, @RequestBody PostRequest request, Principal principal, @RequestHeader("Authorization") String authHeader) {
 
         String role = extractRole(authHeader);
 
