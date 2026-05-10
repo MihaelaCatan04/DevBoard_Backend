@@ -21,4 +21,10 @@ public interface PostMapper {
     List<Post> findAll(@Param("limit") int limit, @Param("skip") int skip, @Param("tag") String tag, @Param("search") String search, @Param("sort") String sort);
 
     long countAll(@Param("tag") String tag, @Param("search") String search);
+
+    List<Post> findByAuthor(@Param("username") String username,
+                            @Param("limit") int limit,
+                            @Param("skip") int skip);
+
+    long countByAuthor(@Param("username") String username);
 }
