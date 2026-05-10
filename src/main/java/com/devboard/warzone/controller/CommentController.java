@@ -7,6 +7,7 @@ import com.devboard.warzone.service.CommentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +33,7 @@ public class CommentController {
 
     @PostMapping
     @Operation(summary = "Add a comment — requires WRITER or ADMIN", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<Comment> addComment(@PathVariable Long postId, @RequestBody CommentRequest request, Principal principal) {
+    public ResponseEntity<Comment> addComment(@Valid @PathVariable Long postId, @RequestBody CommentRequest request, Principal principal) {
 
         Comment comment = commentService.addComment(postId, request, principal.getName());
         return ResponseEntity.status(HttpStatus.CREATED).body(comment);
