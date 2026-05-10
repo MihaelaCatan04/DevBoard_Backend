@@ -50,11 +50,12 @@ public class AdminController {
         return ResponseEntity.noContent().build();
     }
 
-
     @GetMapping("/posts")
-    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Get ALL posts including deleted — ADMIN only", security = @SecurityRequirement(name = "bearerAuth"))
-    public ResponseEntity<PageResponse<Post>> getAllPostsIncludingDeleted(@RequestParam(defaultValue = "10") int limit, @RequestParam(defaultValue = "0") int skip) {
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> getAllPostsIncludingDeleted(
+            @RequestParam(defaultValue = "10") int limit,
+            @RequestParam(defaultValue = "0") int skip) {
         return ResponseEntity.ok(postService.getAllPostsIncludingDeleted(limit, skip));
     }
 
