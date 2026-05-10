@@ -13,7 +13,8 @@
     </resultMap>
 
     <select id="findByPostId" resultMap="commentResultMap">
-        SELECT * FROM comments
+        SELECT *
+        FROM comments
         WHERE post_id = #{postId}
         ORDER BY created_at ASC
         LIMIT #{limit} OFFSET #{skip}
