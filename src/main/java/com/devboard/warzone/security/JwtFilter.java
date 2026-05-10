@@ -36,11 +36,13 @@ public class JwtFilter extends OncePerRequestFilter {
         if (jwtUtil.isTokenValid(token)) {
             String username = jwtUtil.extractUsername(token);
             String role = jwtUtil.extractRole(token);
-
-
             var auth = new UsernamePasswordAuthenticationToken(username, null, List.of(new SimpleGrantedAuthority("ROLE_" + role)));
-
             SecurityContextHolder.getContext().setAuthentication(auth);
+        } else {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.getWriter().write("{\"error\": \"Token expired\"}");
+            return;
         }
 
         chain.doFilter(request, response);
