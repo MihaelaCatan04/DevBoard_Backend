@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.devboard.warzone.mapper.PostMapper">
+
+    <!-- This maps database column names to Java field names -->
+    <resultMap id="postResultMap" type="com.devboard.warzone.model.Post">
+        <id     property="id"        column="id"/>
+        <result property="title"     column="title"/>
+        <result property="body"      column="body"/>
+        <result property="author"    column="author"/>
+        <result property="tag"       column="tag"/>
+        <result property="votes"     column="votes"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+    <!-- Get all posts with optional tag filter and pagination -->
+    <select id="findAll" resultMap="postResultMap">
+        SELECT * FROM posts
+        <where>
+            <if test="tag != null and tag != ''">
+                AND tag = #{tag}
+            </if>
+        </where>
+        ORDER BY created_at DESC
+        LIMIT #{limit} OFFSET #{skip}
+    </select>
+
+    <!-- Count total posts (needed for pagination metadata) -->
+    <select id="countAll" resultType="long">
+        SELECT COUNT(*) FROM posts
+        <where>
+            <if test="tag != null and tag != ''">
+                AND tag = #{tag}
+            </if>
+        </where>
+    </select>
+
+    <!-- Get single post by id -->
+    <select id="findById" resultMap="postResultMap">
+        SELECT * FROM posts WHERE id = #{id}
+    </select>
+
+    <!-- Insert new post, and put the generated id back into the object -->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO posts (title, body, author, tag)
+        VALUES (#{title}, #{body}, #{author}, #{tag})
+    </insert>
+
+    <!-- Update existing post -->
+    <update id="update">
+        UPDATE posts
+        SET title = #{title},
+            body  = #{body},
+            tag   = #{tag}
+        WHERE id = #{id}
+    </update>
+
+    <!-- Delete post -->
+    <delete id="delete">
+        DELETE FROM posts WHERE id = #{id}
+    </delete>
+
+    <!-- Increment or decrement votes -->
+    <!-- direction will be +1 or -1 from the service -->
+    <update id="updateVotes">
+        UPDATE posts SET votes = votes + #{direction} WHERE id = #{id}
+    </update>
+
+</mapper>
