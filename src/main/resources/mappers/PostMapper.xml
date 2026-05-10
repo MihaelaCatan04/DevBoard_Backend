@@ -6,12 +6,12 @@
 
     <!-- This maps database column names to Java field names -->
     <resultMap id="postResultMap" type="com.devboard.warzone.model.Post">
-        <id     property="id"        column="id"/>
-        <result property="title"     column="title"/>
-        <result property="body"      column="body"/>
-        <result property="author"    column="author"/>
-        <result property="tag"       column="tag"/>
-        <result property="votes"     column="votes"/>
+        <id property="id" column="id"/>
+        <result property="title" column="title"/>
+        <result property="body" column="body"/>
+        <result property="author" column="author"/>
+        <result property="tag" column="tag"/>
+        <result property="votes" column="votes"/>
         <result property="createdAt" column="created_at"/>
     </resultMap>
 
@@ -39,7 +39,9 @@
 
     <!-- Get single post by id -->
     <select id="findById" resultMap="postResultMap">
-        SELECT * FROM posts WHERE id = #{id}
+        SELECT *
+        FROM posts
+        WHERE id = #{id}
     </select>
 
     <!-- Insert new post, and put the generated id back into the object -->
@@ -59,13 +61,17 @@
 
     <!-- Delete post -->
     <delete id="delete">
-        DELETE FROM posts WHERE id = #{id}
+        DELETE
+        FROM posts
+        WHERE id = #{id}
     </delete>
 
     <!-- Increment or decrement votes -->
     <!-- direction will be +1 or -1 from the service -->
     <update id="updateVotes">
-        UPDATE posts SET votes = votes + #{direction} WHERE id = #{id}
+        UPDATE posts
+        SET votes = votes + #{direction}
+        WHERE id = #{id}
     </update>
 
 </mapper>
