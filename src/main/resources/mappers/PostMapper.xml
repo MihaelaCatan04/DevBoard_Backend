@@ -4,7 +4,6 @@
 
 <mapper namespace="com.devboard.warzone.mapper.PostMapper">
 
-    <!-- This maps database column names to Java field names -->
     <resultMap id="postResultMap" type="com.devboard.warzone.model.Post">
         <id property="id" column="id"/>
         <result property="title" column="title"/>
@@ -13,48 +12,13 @@
         <result property="tag" column="tag"/>
         <result property="votes" column="votes"/>
         <result property="createdAt" column="created_at"/>
+        <result property="deletedAt" column="deleted_at"/>
     </resultMap>
-
-    <!-- Get single post by id -->
-    <select id="findById" resultMap="postResultMap">
-        SELECT *
-        FROM posts
-        WHERE id = #{id}
-    </select>
-
-    <!-- Insert new post, and put the generated id back into the object -->
-    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO posts (title, body, author, tag)
-        VALUES (#{title}, #{body}, #{author}, #{tag})
-    </insert>
-
-    <!-- Update existing post -->
-    <update id="update">
-        UPDATE posts
-        SET title = #{title},
-            body  = #{body},
-            tag   = #{tag}
-        WHERE id = #{id}
-    </update>
-
-    <!-- Delete post -->
-    <delete id="delete">
-        DELETE
-        FROM posts
-        WHERE id = #{id}
-    </delete>
-
-    <!-- Increment or decrement votes -->
-    <!-- direction will be +1 or -1 from the service -->
-    <update id="updateVotes">
-        UPDATE posts
-        SET votes = votes + #{direction}
-        WHERE id = #{id}
-    </update>
 
     <select id="findAll" resultMap="postResultMap">
         SELECT * FROM posts
         <where>
+            deleted_at IS NULL
             <if test="tag != null and tag != ''">
                 AND tag = #{tag}
             </if>
@@ -86,6 +50,7 @@
     <select id="countAll" resultType="long">
         SELECT COUNT(*) FROM posts
         <where>
+            deleted_at IS NULL
             <if test="tag != null and tag != ''">
                 AND tag = #{tag}
             </if>
@@ -98,6 +63,63 @@
             </if>
         </where>
     </select>
+
+    <select id="findAllIncludingDeleted" resultMap="postResultMap">
+        SELECT *
+        FROM posts
+        ORDER BY created_at DESC
+        LIMIT #{limit} OFFSET #{skip}
+    </select>
+
+    <select id="countAllIncludingDeleted" resultType="long">
+        SELECT COUNT(*)
+        FROM posts
+    </select>
+
+    <select id="findById" resultMap="postResultMap">
+        SELECT *
+        FROM posts
+        WHERE id = #{id}
+    </select>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO posts (title, body, author, tag)
+        VALUES (#{title}, #{body}, #{author}, #{tag})
+    </insert>
+
+    <update id="update">
+        UPDATE posts
+        SET title = #{title},
+            body  = #{body},
+            tag   = #{tag}
+        WHERE id = #{id}
+          AND deleted_at IS NULL
+    </update>
+
+    <update id="softDelete">
+        UPDATE posts
+        SET deleted_at = CURRENT_TIMESTAMP
+        WHERE id = #{id}
+    </update>
+
+    <delete id="hardDelete">
+        DELETE
+        FROM posts
+        WHERE id = #{id}
+    </delete>
+
+    <update id="restore">
+        UPDATE posts
+        SET deleted_at = NULL
+        WHERE id = #{id}
+    </update>
+
+    <update id="updateVotes">
+        UPDATE posts
+        SET votes = votes + #{direction}
+        WHERE id = #{id}
+          AND deleted_at IS NULL
+    </update>
 
     <select id="findByAuthor" resultMap="postResultMap">
         SELECT *
@@ -112,4 +134,5 @@
         FROM posts
         WHERE author = #{username}
     </select>
+
 </mapper>

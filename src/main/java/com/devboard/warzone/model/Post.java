@@ -12,4 +12,5 @@ public class Post {
     private String tag;
     private int votes;
     private LocalDateTime createdAt;
+    private LocalDateTime deletedAt;
 }
