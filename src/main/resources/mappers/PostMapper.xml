@@ -31,10 +31,10 @@
             </if>
         </where>
         <choose>
-            <when test="sort == 'votes'">
+            <when test='sort == "votes"'>
                 ORDER BY votes DESC
             </when>
-            <when test="sort == 'comments'">
+            <when test='sort == "comments"'>
                 ORDER BY (
                 SELECT COUNT(*) FROM comments
                 WHERE comments.post_id = posts.id

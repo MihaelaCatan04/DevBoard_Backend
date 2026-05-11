@@ -1,0 +1,37 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: warzone_db
+    environment:
+      POSTGRES_DB: warzone
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: .
+    container_name: warzone_backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/warzone
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      JWT_SECRET: your-super-secret-key-that-is-long-enough-for-hmac
+      JWT_EXPIRATION: 60000
+      JWT_REFRESH_EXPIRATION: 604800000
+    ports:
+      - "8080:8080"
+
+volumes:
+  postgres_data:

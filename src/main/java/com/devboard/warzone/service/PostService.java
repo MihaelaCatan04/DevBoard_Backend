@@ -57,14 +57,6 @@ public class PostService {
         return post;
     }
 
-    public void votePost(Long id, int direction) {
-        getPostById(id);
-        if (direction != 1 && direction != -1) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Direction must be 1 or -1");
-        }
-        postMapper.updateVotes(id, direction);
-    }
-
     public void deletePost(Long id, String username, String role) {
         Post post = getPostById(id);
 
